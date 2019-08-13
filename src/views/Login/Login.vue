@@ -10,11 +10,11 @@
             i(slot='prefix' class='fa fa-user-o')
         //- password
         el-form-item(prop='pwd')
-          el-input(v-model='ruleForm.pwd' placeholder='账号' auto-complete='off')
+          el-input(v-model='ruleForm.pwd' type='password' placeholder='密码' auto-complete='off')
             i(slot='prefix' class='fa fa-lock')
         //- 登录button
         el-form-item
-          el-button(@click.native.prevent='handleSubmit' type='primary' style='width:100%') 登录
+          el-button(@click.native.prevent='handleSubmit' :loading='isLogin' type='primary' style='width:100%') 登录
         //- 7天登录和忘记密码
         el-form-item
           el-checkbox(v-model='ruleForm.autoLogin' :checked='ruleForm.autoLogin') 7天内自动登录
@@ -29,6 +29,8 @@ import LoginHeader from './LoginHeader.vue'
   components: {LoginHeader,}
 })
 export default class Login extends Vue{
+  @Provide() isLogin:boolean=false
+
   @Provide() ruleForm: {
     username: String;
     pwd: String;
@@ -47,7 +49,18 @@ export default class Login extends Vue{
   handleSubmit():void{
     (this.$refs['ruleForm'] as any).validate((valid:boolean) => {
       if(valid){
-        console.log('校验通过')
+        // console.log('校验通过')
+        this.isLogin = true;
+        (this as any).$axios
+          .post("/api/users/login", this.ruleForm)
+          .then((res: any) => {
+            // console.log('res',res)
+            // 存储token
+            localStorage.setItem('tsToken', res.data.token)
+          })
+          .catch(() => {
+            this.isLogin = false;
+          });
       }
     })
   }
