@@ -32,7 +32,7 @@ export default class LayoutHeader extends Vue {
     if(command=='usercenter') console.log('个人中心')
   }
   created(){
-    console.log(this.getUser)
+    // console.log(this.getUser)
   }
 }
 </script>
