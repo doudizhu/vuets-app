@@ -10,7 +10,7 @@
             i(slot='prefix' class='fa fa-user-o')
         //- password
         el-form-item(prop='pwd')
-          el-input(v-model='ruleForm.password' placeholder='账号' auto-complete='off')
+          el-input(v-model='ruleForm.pwd' placeholder='账号' auto-complete='off')
             i(slot='prefix' class='fa fa-lock')
         //- 登录button
         el-form-item
