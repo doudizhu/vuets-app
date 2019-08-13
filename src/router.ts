@@ -95,8 +95,7 @@ export const asyncRouterMap = [
   },
   {
     path: '*',
-    name: '404',
-    component: ()=>import('@/views/404.vue')
+    redirect: '/404'
   },
   {
     path: '/login',
