@@ -3,14 +3,18 @@
     //- 头部
     LayoutHeader
     //- 内容
-
+    Content
+      Sidebar(slot='left')
+      router-view(slot='content')
 </template>
 
 <script lang='ts'>
 import {Component,Vue} from 'vue-property-decorator'
 import LayoutHeader from './LayoutHeader.vue'
+import Content from './Content.vue'
+import Sidebar from './Sidebar.vue'
 @Component({
-  components:{LayoutHeader}
+  components:{LayoutHeader,Content,Sidebar}
 })
 export default class Layout extends Vue {}
 </script>
