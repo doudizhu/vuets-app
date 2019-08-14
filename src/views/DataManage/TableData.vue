@@ -11,8 +11,8 @@
     el-table-column(prop='count' label='报名人数' width='120')
     el-table-column(prop='date' label='上线日期' width='160')
     el-table-column(label='操作' width='160')
-      template
-        el-button(size='mini') 编辑
+      template(slot-scope='scope')
+        el-button(@click='handleEdit(scope.$index,scope.row)' size='mini') 编辑
         el-button(size='mini' type='danger') 删除
   .pages(ref='page-box')
     el-pagination(
@@ -23,12 +23,14 @@
       layout='total,sizes,prev,pager,next,jumper'
       :total='total'
     )
+  EditDialog(:dialogVisible='dialogVisible' :form='formData')
 </template>
 
 <script lang='ts'>
 import {Component,Vue,Provide} from 'vue-property-decorator'
+import EditDialog from './EditDialog.vue'
 @Component({
-  components:{}
+  components:{EditDialog,}
 })
 export default class TableData extends Vue {
   @Provide() searchVal: string='';// 搜索框
@@ -37,6 +39,21 @@ export default class TableData extends Vue {
   @Provide() page: number = 1; // 当前page
   @Provide() size: number = 5; // 请求数据的个数 默认5
   @Provide() total: number = 0; // 总数据条数
+
+  @Provide() dialogVisible:Boolean = false;// 是否展示编辑页面
+  @Provide() formData:object = {
+    title: '',
+    type: '',
+    level: '',
+    count: '',
+    date: '',
+  }
+
+  handleEdit(index:number,row:any){
+    // console.log(index,row)
+    this.formData = row;
+    this.dialogVisible = true;
+  }
 
   created() {
     this.loadData();
