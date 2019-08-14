@@ -1,11 +1,25 @@
 <template lang='pug'>
-  .home ChartsData
+  .charts-data
+    el-tabs(type='border-card' v-model='tabPosition')
+      el-tab-pane(label='折线图' name='line')
+        Charts(:chartData='chartData' chartType='line')
+      el-tab-pane(label='柱状图' name='bar')
+        Charts(:chartData='chartData' chartType='bar')
+      el-tab-pane(label='饼图' name='pie')
+        Charts(:chartData='chartData' chartType='pie')
 </template>
 
 <script lang='ts'>
-import {Component,Vue} from 'vue-property-decorator'
+import {Component,Vue,Provide} from 'vue-property-decorator'
+import Charts from '../../components/Charts.vue'
 @Component({
-  components:{}
+  components:{Charts}
 })
-export default class ChartsData extends Vue {}
+export default class ChartsData extends Vue {
+  @Provide() tabPosition:string = 'line';
+  @Provide() chartData:any = {
+    xAxisData: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+    yAxisData: [820, 932, 901, 934, 1290, 1330, 1320]
+  };
+}
 </script>
