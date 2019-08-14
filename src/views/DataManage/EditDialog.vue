@@ -1,6 +1,6 @@
 <template lang='pug'>
-el-dialog(title='编辑课程' :visible.sync='dialogVisible')
-  el-form(:model='form' ref='ruleForm' label-width='100px' size='small' class='form-box')
+el-dialog(title='编辑课程' :visible.sync='dialogVisible' :show-close='false' :close-on-click-modal='false')
+  el-form(:model='form' :rules='rules' ref='ruleForm' label-width='100px' size='small' class='form-box')
     el-form-item(prop='title' label='课程名称')
       el-input(v-model='form.title' placeholder='请输入课程名称')
     el-form-item(prop='level' label='课程等级')
@@ -24,8 +24,8 @@ el-dialog(title='编辑课程' :visible.sync='dialogVisible')
         el-radio(label='小程序' name='type')
         el-radio(label='angular' name='type')
   span.dialog-footer(slot='footer')
-    el-button(size='small') 取消
-    el-button(type='primary' size='small') 确定
+    el-button(@click='$emit("closeDialog")' size='small') 取消
+    el-button(@click='submitForm("ruleForm")' type='primary' size='small') 确定
 </template>
 
 <script lang='ts'>
@@ -44,6 +44,43 @@ export default class EditDialog extends Vue {
     date: string,
     _id: string;
   };
+
+  @Provide() rules:any = {
+    title:[{required:true,message:'请输入课程名称',trigger:'blur'}],
+    level:[{required:true,message:'请输入课程等级',trigger:'change'}],
+    count:[{required:true,message:'请输入报名人数',trigger:'blur'}],
+    date: [
+      {
+        type: "string",
+        required: true,
+        message: "请选择日期",
+        trigger: "change"
+      }
+    ],
+    type: [
+      {
+        required: true,
+        message: "请选择技术栈",
+        trigger: "change"
+      }
+    ]
+  }
+
+  submitForm(formName:any){
+    (this.$refs[formName] as any).validate((valid:boolean)=>{
+      if(valid){
+        (this as any).$axios.post(`/api/profiles/edit/${this.form._id}`)
+          .then((res:any)=>{
+            // console.log(res.data)
+            this.$emit('closeDialog');
+            this.$message({
+              message:res.data.msg,
+              type:'success'
+            })
+          })
+      }
+    })
+  }
 
   created(){
     console.log(this.dialogVisible, this.form)

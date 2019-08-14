@@ -13,7 +13,7 @@
     el-table-column(label='操作' width='160')
       template(slot-scope='scope')
         el-button(@click='handleEdit(scope.$index,scope.row)' size='mini') 编辑
-        el-button(size='mini' type='danger') 删除
+        el-button(@click='handleDelete(scope.$index,scope.row)' size='mini' type='danger') 删除
   .pages(ref='page-box')
     el-pagination(
       @size-change='handleSizeChange'
@@ -23,7 +23,7 @@
       layout='total,sizes,prev,pager,next,jumper'
       :total='total'
     )
-  EditDialog(:dialogVisible='dialogVisible' :form='formData')
+  EditDialog(:dialogVisible='dialogVisible' :form='formData' @closeDialog='closeDialog')
 </template>
 
 <script lang='ts'>
@@ -53,6 +53,20 @@ export default class TableData extends Vue {
     // console.log(index,row)
     this.formData = row;
     this.dialogVisible = true;
+  }
+
+  handleDelete(index:number,row:any){
+    console.log(row._id);
+    (this as any).$axios
+      .delete(`/api/profiles/delete/${row._id}`)
+      .then((res:any)=>{
+        this.$message({
+          message:res.data.msg,
+          type: 'success'
+        })
+      })
+
+    this.tableData.splice(index,1);
   }
 
   created() {
@@ -92,6 +106,10 @@ export default class TableData extends Vue {
         this.tableData = res.data.datas.list;
         this.total = res.data.datas.total;
       })
+  }
+
+  closeDialog(){
+    this.dialogVisible = false;
   }
 }
 </script>
