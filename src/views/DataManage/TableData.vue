@@ -2,7 +2,7 @@
 .table-data
   .search-box
     el-input(size='small' v-model='searchVal' placeholder='请输入课程名称检索')
-    el-button(size='small' type='primary' icon='el-icon-search') 搜索
+    el-button(@click='handleSearch' size='small' type='primary' icon='el-icon-search') 搜索
   el-table.table-box(:data='tableData' border style='width:100%;' :height='tHeight')
     el-table-column(type='index' label='序号' width='60')
     el-table-column(prop='title' label='课程名称')
@@ -16,6 +16,8 @@
         el-button(size='mini' type='danger') 删除
   .pages(ref='page-box')
     el-pagination(
+      @size-change='handleSizeChange'
+      @current-change='handleCurrentChange'
       :page-sizes='[5,10,20]' 
       :page-size='size' 
       layout='total,sizes,prev,pager,next,jumper'
@@ -46,6 +48,32 @@ export default class TableData extends Vue {
         // console.log(res.data);
         this.tableData = res.data.data.list;
         this.total = res.data.data.total;
+      })
+  }
+
+  handleSizeChange(val:number):void{
+    this.size = val;
+    this.page = 1
+    this.loadData();
+  }
+
+  handleCurrentChange(val:number):void{
+    this.page = val;
+    this.searchVal ? this.loadSearchData() : this.loadData();
+  }
+
+  handleSearch():void{
+    // 点击搜索
+    this.page = 1;
+    this.searchVal ? this.loadSearchData() : this.loadData();
+  }
+  loadSearchData():void{
+    // 点击搜索
+    (this as any).$axios(`/api/profiles/search/${this.searchVal}/${this.page}/${this.size}`)
+      .then((res:any)=>{
+        console.log(res.data)
+        this.tableData = res.data.datas.list;
+        this.total = res.data.datas.total;
       })
   }
 }
