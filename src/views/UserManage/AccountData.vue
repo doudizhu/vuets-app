@@ -5,15 +5,24 @@
   el-table(:data='tableData' border style='width:100%;')
     el-table-column(label='角色' width='180')
       template(slot-scope='scope')
-        span {{scope.row.role}}
+        el-select(v-if='scope.row.edit' @change='selectChange(scope.row)' v-model='scope.row.role')
+          el-option(
+            v-for="option in options" 
+            :label="option.role"
+            :value="option.role"
+            :key="option.key"
+          )
+        span(v-else) {{scope.row.role}}
     el-table-column(label='账号' width='180')
       template(slot-scope='scope')
-        span {{scope.row.username}}
+        el-input(v-if='scope.row.edit' v-model='scope.row.username')
+        span(v-else) {{scope.row.username}}
     el-table-column(prop='des' label='描述' width='180')
     el-table-column(label='操作' width='180')
       template(slot-scope='scope' v-if='scope.row.username != "admin"')
-        el-button(size='mini') 编辑
-        el-button(size='mini' type='danger') 删除
+        el-button(v-if='!scope.row.edit' @click='handleEdit(scope.$index,scope.row)' size='mini') 编辑
+        el-button(v-else @click='handleSave(scope.$index,scope.row)' type='success' size='mini') 完成
+        el-button(@click='handleDelete(scope.$index,scope.row)' size='mini' type='danger') 删除
 
   AddAccount(:dialogVisible='dialogVisible' :options='options' @closeDialog='closeDialog' @update='getData')
 </template>
@@ -50,10 +59,53 @@ export default class AccountData extends Vue {
   created(){
     this.getData();
   }
+  handleDelete(index:number,row:any):void{
+    // 删除
+    (this as any).$axios
+      .delete(`/api/users/deleteUser/${row._id}`)
+      .then((res:any)=>{
+        this.$message({
+          message:res.data.msg,
+          type:'success'
+        })
+      })
+    this.tableData.splice(index,1)
+  }
+  selectChange(item: any){
+    this.options.map((option:any)=>{
+      if(option.role == item.role){
+        item.key = option.key;
+        item.des = option.des;
+      }
+    })
+  }
+  handleEdit(index:number,row:any):void{
+    // 编辑
+    row.edit = true
+  }
+  handleSave(index:number,row:any):void{
+    // 完成
+    row.edit = false;
+    (this as any).$axios
+      .post(`/api/users/editUser/${row._id}`,row)
+      .then((res:any)=>{
+        this.$message({
+          message: res.data.msg,
+          type: 'success',
+        })
+      })
+  }
 
   getData(){
     (this as any).$axios('/api/users/allUsers').then((res:any)=>{
+      // 设置编辑状态
+      res.data.datas.forEach((item:any)=>{
+        item.edit = false
+      })
       this.tableData = res.data.datas;
+
+      // console.log('this.tableData:',this.tableData)
+
     })
   }
 
