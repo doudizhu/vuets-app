@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Layout from './views/Layout/Index.vue'
+import jwt_decode from "jwt-decode";
 
 Vue.use(Router)
 
@@ -124,8 +125,36 @@ router.beforeEach((to:any,from:any,next:any)=>{
   if(to.path == '/login' || to.path == '/password'){
     next()
   }else{
-    isLogin ? next() : next('/login')
+    if(isLogin){
+      const decode:any = jwt_decode(localStorage.tsToken);
+      const {key} = decode;
+      // 权限判断
+      if(hasPermission(key,to)){
+        next()
+      }else{
+        next('/404'); // 没有权限进入
+      }
+    }else{
+      next('/login')
+    }
   }
 })
 
 export default router
+
+/**
+ * 判断是否有权限
+ * @param roles 当前角色
+ * @param route 当前路由对象
+ */
+function hasPermission(roles:string,route:any){
+  if(route.meta && route.meta.roles) {// 是否meta.roles包含角色的key值，如果包含那么就是有权限，否则无权限
+    return route.meta.roles.some((role:string)=>
+      role.indexOf(roles) >= 0
+    )
+    // 待测试：是否可简写为：
+    // return route.meta.roles.indexOf(roles) >= 0
+  }else{ // 默认不设置有权限
+    return true;
+  }
+}
