@@ -10,7 +10,7 @@
     el-table-column(prop='type' label='技术栈' width='120')
     el-table-column(prop='count' label='报名人数' width='120')
     el-table-column(prop='date' label='上线日期' width='160')
-    el-table-column(label='操作' width='160')
+    el-table-column(v-if='getUser.key != "visitor"' label='操作' width='160')
       template(slot-scope='scope')
         el-button(@click='handleEdit(scope.$index,scope.row)' size='mini') 编辑
         el-button(@click='handleDelete(scope.$index,scope.row)' size='mini' type='danger') 删除
@@ -28,11 +28,14 @@
 
 <script lang='ts'>
 import {Component,Vue,Provide} from 'vue-property-decorator'
+import {State,Getter,Mutation,Action} from 'vuex-class'
 import EditDialog from './EditDialog.vue'
 @Component({
   components:{EditDialog,}
 })
 export default class TableData extends Vue {
+  @Getter('user') getUser: any;
+
   @Provide() searchVal: string='';// 搜索框
   @Provide() tHeight: number=document.body.offsetHeight - 270;
   @Provide() tableData: any = []; // 表格数据
