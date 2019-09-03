@@ -22,7 +22,7 @@ const actions: ActionTree<any,any> = {
 function filterAsyncRouter(asyncRouterMap:Array<any>,roles:string){
   const accessedRouters = asyncRouterMap.filter(route=>{
     // console.log('route:',route)
-    if(hasPerssion(roles,route)){
+    if(hasPermission(roles,route)){
       if(route.children && route.children.length){
         route.children = filterAsyncRouter(route.children,roles)
       }
@@ -38,7 +38,7 @@ function filterAsyncRouter(asyncRouterMap:Array<any>,roles:string){
  * @param roles 当前角色
  * @param route 当前路由对象
  */
-function hasPerssion(roles:string,route:any){
+function hasPermission(roles:string,route:any){
   if(route.meta && route.meta.roles) {// 是否meta.roles包含角色的key值，如果包含那么就是有权限，否则无权限
     return route.meta.roles.some((role:string)=>
       role.indexOf(roles) >= 0
